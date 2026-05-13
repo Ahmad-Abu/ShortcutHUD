@@ -1,41 +1,50 @@
 # Installing ShortcutHUD
 
-ShortcutHUD requires macOS 13 (Ventura) or later.
+ShortcutHUD requires **macOS 13 (Ventura) or later** on an **Apple Silicon Mac** (M1/M2/M3/M4).
 
-## 1 — Install
+The app is ad-hoc signed (not yet notarized through the Apple Developer Program), so macOS Gatekeeper will refuse the first launch unless you clear the "downloaded from the internet" flag. There are two ways to install — pick whichever feels comfortable.
+
+---
+
+## Option 1 — One-line install (Recommended)
+
+If you're comfortable with Terminal, this is the fastest and most reliable path. It downloads the latest release, removes the quarantine flag, and launches the app.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Ahmad-Abu/ShortcutHUD/main/ShortcutHUD/install.sh | bash
+```
+
+> Want to read the script before running it? It's right here: [install.sh](https://github.com/Ahmad-Abu/ShortcutHUD/blob/main/ShortcutHUD/install.sh)
+
+---
+
+## Option 2 — Manual install from DMG
+
+> ⚠️ **Important**: On macOS Sonoma and Tahoe (14+ / 26+), you **must remove the quarantine flag before double-clicking the app**. If you double-click first, macOS may silently delete the app within seconds. The Terminal command in step 3 below is not optional.
+
+### 1. Install the app
 
 1. Double-click `ShortcutHUD-x.y.z.dmg` to mount it.
 2. Drag **ShortcutHUD** into the **Applications** folder.
 3. Eject the DMG.
 
-## 2 — First Launch (Important)
+### 2. Remove the quarantine flag — DO THIS BEFORE FIRST LAUNCH
 
-ShortcutHUD is distributed without an Apple Developer signature, so the first time you open it macOS will warn you that **"ShortcutHUD" cannot be opened because Apple cannot check it for malicious software**.
+Open **Terminal** (Applications → Utilities → Terminal) and paste:
 
-**To open it the first time:**
+```sh
+xattr -dr com.apple.quarantine /Applications/ShortcutHUD.app
+```
 
-1. Open the **Applications** folder.
-2. **Right-click** (or Control-click) `ShortcutHUD` → **Open**.
-3. In the dialog that appears, click **Open** again.
+This removes the "downloaded from the internet" tag macOS attaches to anything from a browser. Without this step, macOS will refuse to launch the app and may even delete it.
 
-After this one-time approval, you can launch ShortcutHUD normally by double-clicking it.
+### 3. Launch ShortcutHUD
 
-### If you still can't open it (macOS Sonoma / Sequoia)
+Now double-click **ShortcutHUD** in the Applications folder. It should launch normally and show up in the menu bar (top-right of screen) as a small keyboard icon.
 
-Newer macOS versions sometimes block the right-click bypass. In that case:
+### 4. Grant Accessibility permission
 
-1. Open **Terminal** (Applications → Utilities → Terminal).
-2. Paste this command and press Return:
-   ```
-   xattr -dr com.apple.quarantine /Applications/ShortcutHUD.app
-   ```
-3. Now double-click ShortcutHUD in Applications.
-
-This removes the "downloaded from the internet" flag macOS attaches to the app.
-
-## 3 — Grant Accessibility Permission
-
-ShortcutHUD needs to observe keyboard events to count how often you use each shortcut. macOS will prompt you when you first launch it.
+ShortcutHUD needs to observe keyboard events to count how often you use each shortcut.
 
 1. The HUD will show **"Accessibility access needed"**.
 2. Open **System Settings → Privacy & Security → Accessibility**.
@@ -44,17 +53,24 @@ ShortcutHUD needs to observe keyboard events to count how often you use each sho
 
 The HUD will now track your shortcuts.
 
+---
+
 ## Uninstall
 
 1. Quit ShortcutHUD from the menu bar.
 2. Drag `ShortcutHUD.app` to the Trash.
 3. (Optional) Remove your usage data:
-   ```
+   ```sh
    rm -rf ~/Library/Application\ Support/ShortcutHUD
    ```
 
 ## Troubleshooting
 
-- **HUD doesn't appear** — check the menu bar (top right of your screen) for the ShortcutHUD icon. Click it to toggle visibility.
-- **Permissions seem stuck** — open System Settings → Privacy & Security → Accessibility, remove any existing ShortcutHUD entries, then relaunch the app and re-approve.
+- **App vanished from /Applications right after I double-clicked it** — this is the macOS Gatekeeper auto-removal behavior. Re-install and make sure to run the `xattr` command **before** double-clicking. The one-line installer above does this automatically.
+- **HUD doesn't appear after launch** — check the menu bar (top right of your screen) for the small keyboard icon. Click it to toggle visibility.
+- **Permissions seem stuck** — open System Settings → Privacy & Security → Accessibility, remove any existing ShortcutHUD entries, quit the app, relaunch, and re-approve.
 - **No shortcuts shown for an app** — ShortcutHUD ships with a built-in library of 25 popular apps. If your app isn't supported, the HUD will say so.
+
+## Why all this friction?
+
+ShortcutHUD is currently ad-hoc signed. Apple's Gatekeeper treats anything not signed with a paid Apple Developer ID ($99/year) as untrusted, and on macOS Tahoe (26.x) this enforcement got much more aggressive — the OS will silently delete unsigned downloads on launch attempt. Notarization through the Apple Developer Program would eliminate this, and may happen in a future release.
